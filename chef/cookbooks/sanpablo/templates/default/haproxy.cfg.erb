@@ -1,0 +1,42 @@
+global
+  log 127.0.0.1   local0
+  log 127.0.0.1   local1 notice
+  #log loghost    local0 info
+  maxconn 4096
+  #debug
+  #quiet
+  user haproxy
+  group haproxy
+
+defaults
+  log     global
+  mode    http
+  retries 3
+  timeout client 100s
+  timeout connect 100s
+  timeout server 100s
+  option dontlognull
+  option redispatch
+  balance  roundrobin
+
+# Set up application listeners here.
+
+listen admin
+  bind 0.0.0.0:22002
+  mode http
+  stats uri /
+
+# Cookies are more complicated than they seem so don't use for now
+listen http-proxy
+        bind :80
+        mode http
+        option httplog
+        option forwardfor
+        server elb production-west-app-1676035148.us-west-1.elb.amazonaws.com:80 weight 100 check
+
+listen https-proxy
+        bind :443
+        mode tcp
+        option ssl-hello-chk
+        server elbs production-west-app-1676035148.us-west-1.elb.amazonaws.com:443 weight 100 check
+

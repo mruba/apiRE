@@ -1,0 +1,256 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.berkshelf.enabled = true
+  config.omnibus.chef_version = :latest
+  # config.vm.provision :shell, :inline => "ulimit -n 4048"
+
+  domain = "sanpablo"
+
+  environments = {
+
+    ### LOCAL ###
+    # development_local: [
+    #   {
+    #     provider:         :virtualbox,
+    #     name:             "app",
+    #     ip:               "10.123.61.100",
+    #     roles:            %w(base db app)
+    #   },
+    #   {
+    #     provider:         :virtualbox,
+    #     name:             "jenkins",
+    #     ip:               "10.123.61.101",
+    #     roles:            %w(jenkins)
+    #   }
+    # ],
+
+    ###  DEV, QA and Jenkins ###
+    # east: [
+    #   {
+    #     provider:         :aws,
+    #     name:             "app",
+    #     dns:              "app.staging-east.sanpablo",
+    #     roles:            %w(base db app),
+    #     instance_type:    "t1.micro",
+    #     ami:              "ami-7747d01e",
+    #   },
+    #   {
+    #     provider:         :aws,
+    #     name:             "app",
+    #     dns:              "app.qa-east.sanpablo",
+    #     roles:            %w(base db app),
+    #     instance_type:    "t1.micro",
+    #     ami:              "ami-7747d01e",
+    #   },
+      # {
+      #   provider:         :aws,
+      #   name:             "jenkins",
+      #   dns:              "jenkins.east.sanpablo",
+      #   roles:            %w(jenkins),
+      #   instance_type:    "t1.micro",
+      #   instance_type:    "ami-e039e8f6"
+      #   #ami:              "ami-332ffe25",
+      # }
+    # ],
+
+    # TODO: Provide IP and subnet
+    # staging: [
+    #   {
+    #     provider:         :aws,
+    #     name:             "db",
+    #     roles:            %w(db),
+    #     ami:              "ami-7747d01e",
+    #     subnet_id:        "subnet-81d4dcf5",
+    #     security_groups:  ["sg-7ffb241a"],
+    #     ip:               '10.0.0.10',
+    #    elastic_ip:       true,
+    #     name_tag:         "San Pablo Staging DB"
+    #   },
+    # ],
+
+    :"staging-east" => [],
+    :"production-east" => []
+  }
+
+
+  default_block_device = {
+      'DeviceName' => "/dev/sdf",
+      'Ebs.VolumeSize' => 40,
+      'Ebs.DeleteOnTermination' => false
+  }
+
+  configure_machine = ->(machine_config, environment_defaults) do
+    machine_config = environment_defaults.merge(machine_config)
+    machine_config[:dns]      ||= "#{machine_config[:name]}.#{machine_config[:environment]}.#{machine_config[:base_domain]}"
+    machine_config[:host]     ||= machine_config[:dns] unless machine_config.has_key?(:host)
+    machine_config[:name_tag] ||= machine_config[:dns]
+    machine_config[:roles]    ||= machine_config[:roles]
+    machine_config[:roles] = machine_config[:roles] + machine_config[:additional_roles] if machine_config[:additional_roles]
+    machine_config[:block_device_mapping] ||= [default_block_device.dup]
+    machine_config[:block_device_mapping].each do |mapping|
+      mapping["VirtualName"] ||= "#{machine_config[:name_tag]}/volume/#{mapping["DeviceName"]}"
+    end
+
+    environments[machine_config[:environment].to_sym].push(machine_config)
+  end
+
+  production_west_defaults = {
+    base_domain:           "sanpablo.fsanpablo.io",
+    environment:      "production-east",
+    ssh_gateway:      "ubuntu@34.195.178.78",
+    region:           "us-east-1",
+    provider:         :aws,
+    roles:            %w(base),
+    ami:              "ami-332ffe25",
+    # ami:              "ami-660c3023",
+    subnet_id:        "subnet-751cd058",
+    security_groups:  ["sg-93d658ec"],
+    elastic_ip:       false,
+    json: {}
+  }
+
+  staging_east_defaults = {
+    base_domain:           "sanpablo.fsanpablo.io",
+    environment:      "staging-east",
+    region:           "us-east-1",
+    provider:         :aws,
+    roles:            %w(base),
+    ami:              "ami-332ffe25",
+    ssh_gateway:      "ubuntu@34.199.193.30",
+    #subnet private by default
+    subnet_id:        "subnet-afa030ca",
+    #staging internal
+    security_groups:  ["sg-817b65fd"],
+    elastic_ip:       false,
+    json: {}
+  }
+
+
+  [ # production-west setup
+    { name: 'admin', ip: "10.0.0.100", subnet_id: 'subnet-5762707a', security_groups:  ["sg-5fd15f20"], elastic_ip: true,  ssh_gateway: false, host: nil, instance_type: "t2.micro"},
+  #   { additional_roles: %w(proxy), name: 'proxy', ip: "10.0.0.101", subnet_id: 'subnet-948c96f6', security_groups:  ["sg-04f41161", "sg-e9b6528c", "sg-1452b671"], elastic_ip: true },
+    # { name: 'app-01', ip: "10.0.1.231", subnet_id: 'subnet-751cd058', security_groups:  ["sg-93d658ec"], additional_roles: %w(app), instance_type: "t2.small"  },
+    # { name: 'app-02', ip: "10.0.1.232", subnet_id: 'subnet-751cd058', security_groups:  ["sg-93d658ec"], additional_roles: %w(app), instance_type: "t2.small"  },
+    # { name: 'rmq-01', ip: "10.0.1.235", subnet_id: 'subnet-751cd058', security_groups:  ["sg-93d658ec","sg-5c026b23"], additional_roles: %w(rabbitmq), instance_type: "t2.micro" },
+    # { name: 'rmq-02', ip: "10.0.1.236", subnet_id: 'subnet-751cd058', security_groups:  ["sg-93d658ec"], additional_roles: %w(rabbitmq), instance_type: "t2.micro" },
+    # { name: 'rmq-03', ip: "10.0.1.237", subnet_id: 'subnet-751cd058', security_groups:  ["sg-93d658ec"], additional_roles: %w(rabbitmq), instance_type: "t2.micro" },
+    #
+    # { name: 'worker-01', ip: "10.0.1.238", subnet_id: 'subnet-751cd058', security_groups:  ["sg-817b65fd"], additional_roles: %w(app), instance_type: "t2.micro"}
+  #   { additional_roles: %w(app), name: 'app-02', ip: "10.0.1.232" },
+  #   { additional_roles: %w(db), name: 'db-r0', ip: "10.0.1.200", block_device_mapping: [ default_block_device.merge({'Ebs.VolumeSize' => 100})] },
+  #   { additional_roles: %w(db), name: 'db-r1', ip: "10.0.1.201", block_device_mapping: [ default_block_device.merge({'Ebs.VolumeSize' => 100})] },
+  #   { additional_roles: %w(db), name: 'db-r2', ip: "10.0.1.202", block_device_mapping: [ default_block_device.merge({'Ebs.VolumeSize' => 100})] },
+  #   { additional_roles: %w(solr), name: 'solr-01', ip: "10.0.1.211" }
+  ].each do |machine_config|
+    configure_machine.call(machine_config, production_west_defaults)
+  end
+
+  [ # staging-west setup
+    # { name: 'admin', ip: "10.0.10.100", subnet_id: 'subnet-6ea2320b', security_groups:  ["sg-de584aa2"], elastic_ip: true, ssh_gateway: false, host: nil, instance_type: "t2.micro" },
+    # { name: 'app-01', ip: "10.0.11.231", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd"], additional_roles: %w(app), instance_type: "t2.micro" },
+    # { name: 'app-02', ip: "10.0.11.239", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd"], additional_roles: %w(app), instance_type: "t2.micro" },
+
+    # { name: 'pio-01', ip: "10.0.11.232", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd"], instance_type: "r3.large", ami: "ami-09b3691f", block_device_mapping: [ default_block_device.merge({'Ebs.VolumeSize' => 40})] },
+    # { name: 'pio-02', ip: "10.0.11.233", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd"], additional_roles: %w(pio), instance_type: "r3.large", ami: "ami-09b3691f", block_device_mapping: [ default_block_device.merge({'Ebs.VolumeSize' => 40})] },
+    # { name: 'pio-03', ip: "10.0.11.234", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd"], additional_roles: %w(pio), instance_type: "r3.large", ami: "ami-09b3691f", block_device_mapping: [ default_block_device.merge({'Ebs.VolumeSize' => 40})] },
+
+    # { name: 'rmq-01', ip: "10.0.11.235", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd","sg-2a986955"], additional_roles: %w(rabbitmq), instance_type: "t2.micro" },
+    # { name: 'rmq-02', ip: "10.0.11.236", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd"], additional_roles: %w(rabbitmq), instance_type: "t2.micro" },
+    # { name: 'rmq-03', ip: "10.0.11.237", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd"], additional_roles: %w(rabbitmq), instance_type: "t2.micro" },
+
+    # { name: 'worker-01', ip: "10.0.11.238", subnet_id: 'subnet-afa030ca', security_groups:  ["sg-817b65fd", "sg-2a986955"], additional_roles: %w(app), instance_type: "t2.micro", block_device_mapping: [ default_block_device.merge({'Ebs.VolumeSize' => 30})] },
+
+    # { name: 'jenkins', ip: "10.0.10.208", subnet_id: 'subnet-6ea2320b', security_groups:  ["sg-de584aa2"], sh_gateway: false, host: nil, additional_roles: %w(jenkins), instance_type: "t2.micro" }
+
+    # { additional_roles: %w(db), name: 'db-r0', ip: "10.0.11.200" },
+    # { additional_roles: %w(db), name: 'db-r1', ip: "10.0.11.201" },
+    # { additional_roles: %w(db), name: 'db-r2', ip: "10.0.11.202" },
+    # { additional_roles: %w(solr), name: 'solr-01', ip: "10.0.11.211" }
+  ].each do |machine_config|
+    configure_machine.call(machine_config, staging_east_defaults)
+  end
+
+  environments.each do |e, machines|
+
+    machines.each do |machine|
+      environment = machine[:environment] || e.to_s.gsub("_","-")
+
+      dns = machine[:dns] || "#{machine[:name]}.#{environment}.#{domain}"
+
+      config.vm.define dns do |node|
+        node.vm.network :private_network, ip: machine[:ip]
+
+        case machine[:provider]
+        when :aws
+          node.vm.box                       = "dummy"
+
+          node.vm.provider :aws do |aws, override|
+            aws.access_key_id               = ENV["SANPABLO_AWS_ACCESS_KEY_ID"]
+            aws.secret_access_key           = ENV["SANPABLO_AWS_SECRET_ACCESS_KEY"]
+            aws.keypair_name                = ENV["SANPABLO_AWS_KEYPAIR_NAME"]
+
+            aws.block_device_mapping        = machine[:block_device_mapping]
+            aws.subnet_id                   = machine[:subnet_id]
+            aws.region                      = machine[:region]
+            aws.private_ip_address          = machine[:ip]
+            aws.ami                         = machine[:ami]
+            aws.instance_type               = machine[:instance_type]
+            aws.security_groups             = machine[:security_groups]
+            aws.elastic_ip                  = !!machine[:elastic_ip]
+            aws.tags                        = {"Name" => machine[:name_tag]}
+
+            override.ssh.host               = machine[:host] if machine[:host]
+            override.ssh.username           = "ubuntu"
+            override.ssh.private_key_path   = ENV["SANPABLO_AWS_PRIVATE_KEY_PATH"]
+            override.ssh.forward_agent = true
+            override.ssh.proxy_command      = "nohup ssh #{machine[:ssh_gateway]} nc %h %p" if machine[:ssh_gateway]
+          end
+        when :virtualbox
+          node.vm.box = "ubuntu-precise-12.04.3-lts"
+          node.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box"
+
+          node.vm.provider :virtualbox do |provider|
+            provider.customize ["modifyvm", :id, "--memory", "1024"]
+            provider.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+          end
+        end
+
+        chef_solo(dns, node, environment, machine[:json] || {}, machine[:roles])
+      end
+
+    end # machines end
+
+    def chef_solo(dns, node, environment, chef_json = {}, additional_roles = [])
+      node.vm.provision :chef_solo do |chef|
+        chef.roles_path = "roles"
+        chef.data_bags_path = "data_bags"
+        chef.environments_path = "environments"
+        puts environment
+        puts additional_roles
+        chef.environment = environment
+
+        additional_roles.each do |role_name|
+          chef.add_role role_name
+        end
+
+        chef.node_name = dns
+
+        chef.json = {
+          rvm: {
+            vagrant: {
+              system_chef_client: "/opt/chef/bin/chef-client",
+              system_solo_client: "/opt/chef/bin/chef-solo"
+            }
+          }
+        }.update(chef_json)
+
+        yield(chef) if block_given?
+      end
+    end
+
+
+  end #environments end
+end

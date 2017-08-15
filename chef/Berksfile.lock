@@ -1,0 +1,140 @@
+DEPENDENCIES
+  aws
+    git: https://github.com/opscode-cookbooks/aws.git
+    revision: c3f4423220c45cbdcbdd1d3b60f489ddc16eda15
+  chef-solo-search
+    git: https://github.com/edelight/chef-solo-search.git
+    revision: 72bd5e3507056e5c931ee0cf7516ce1bfbce6d51
+  haproxy
+    git: https://github.com/hw-cookbooks/haproxy.git
+    revision: 4907c02bb0e4a4686048b579fa2096196e9b2766
+  jenkins
+    git: https://github.com/opscode-cookbooks/jenkins.git
+    revision: 0fe528615827f95fb91849b109e209e585966db1
+  mongodb
+    git: https://github.com/edelight/chef-mongodb.git
+    revision: dc5836318a27331f605f264d946931927dd26bb8
+  nodejs
+    git: https://github.com/redguide/nodejs.git
+    revision: abeacf952e913e42c2b8fbd25200392f6058e043
+  npm
+  nvm
+  pm2
+    git: https://github.com/Mindera/pm2-cookbook.git
+    revision: 1ea846e1240e7a0f5d0b7b3367e26cb4938f2719
+  rabbitmq
+    git: https://github.com/rabbitmq/chef-cookbook.git
+    revision: d659bdf6ac7bb54445319124ed86ecf27373bce9
+  rvm
+    git: https://github.com/fnichol/chef-rvm.git
+    revision: eddd733694a1d3e0872f5692e8dda93aa2752791
+  sanpablo
+    path: cookbooks/sanpablo
+  sudo
+
+GRAPH
+  apt (6.0.0)
+  ark (2.2.1)
+    build-essential (>= 0.0.0)
+    seven_zip (>= 0.0.0)
+    windows (>= 0.0.0)
+  aws (4.2.0)
+    ohai (>= 4.0.0)
+  build-essential (8.0.0)
+    mingw (>= 1.1)
+    seven_zip (>= 0.0.0)
+  chef-solo-search (0.5.2)
+  chef_gem (0.1.0)
+  compat_resource (12.16.3)
+  cpu (1.0.0)
+  dmg (3.1.0)
+  dpkg_autostart (0.2.0)
+  erlang (4.1.1)
+    apt (>= 1.7.0)
+    build-essential (>= 0.0.0)
+    yum (>= 3.0)
+    yum-epel (>= 0.0.0)
+    yum-erlang_solutions (>= 0.0.0)
+  git (6.0.0)
+    build-essential (>= 0.0.0)
+    dmg (>= 0.0.0)
+    yum-epel (>= 0.0.0)
+  haproxy (3.0.1)
+    build-essential (>= 0.0.0)
+    cpu (>= 0.2.0)
+    poise-service (>= 0.0.0)
+  homebrew (3.0.0)
+  java (1.47.0)
+    apt (>= 0.0.0)
+    homebrew (>= 0.0.0)
+    windows (>= 0.0.0)
+  jenkins (4.2.1)
+    compat_resource (>= 12.16.3)
+    dpkg_autostart (>= 0.0.0)
+    runit (>= 1.7.0)
+  mingw (1.2.5)
+    compat_resource (>= 12.16.3)
+    seven_zip (>= 0.0.0)
+  mongodb (0.16.3)
+    apt (>= 1.8.2)
+    python (>= 0.0.0)
+    yum (>= 3.0.0)
+  nodejs (3.0.0)
+    apt (>= 2.9.1)
+    ark (>= 0.0.0)
+    build-essential (>= 0.0.0)
+    homebrew (>= 0.0.0)
+    yum-epel (>= 0.0.0)
+  npm (0.1.2)
+    nodejs (>= 0.0.0)
+  nvm (0.1.7)
+    build-essential (>= 0.0.0)
+    git (>= 0.0.0)
+  ohai (4.2.3)
+    compat_resource (>= 12.14.7)
+  packagecloud (0.2.5)
+  pm2 (0.7.4)
+    poise-javascript (~> 1.1.0)
+  poise (2.7.2)
+  poise-archive (1.4.0)
+    poise (~> 2.6)
+  poise-javascript (1.1.0)
+    poise (~> 2.0)
+    poise-languages (~> 2.0)
+  poise-languages (2.0.5)
+    poise (~> 2.5)
+    poise-archive (~> 1.0)
+  poise-service (1.4.2)
+    poise (~> 2.0)
+  python (1.4.6)
+    build-essential (>= 0.0.0)
+    yum-epel (>= 0.0.0)
+  rabbitmq (4.10.0)
+    dpkg_autostart (>= 0.0.0)
+    erlang (>= 0.0.0)
+    yum-epel (>= 0.0.0)
+    yum-erlang_solutions (>= 0.0.0)
+  runit (3.0.5)
+    packagecloud (>= 0.0.0)
+    yum-epel (>= 0.0.0)
+  rvm (0.10.1)
+    chef_gem (>= 0.0.0)
+    java (>= 0.0.0)
+  sanpablo (0.2.0)
+    aws (>= 0.0.0)
+    jenkins (>= 0.0.0)
+    npm (>= 0.0.0)
+    nvm (~> 0.1)
+    rvm (>= 0.0.0)
+    sudo (>= 0.0.0)
+  seven_zip (2.0.2)
+    windows (>= 1.2.2)
+  sudo (3.3.1)
+  windows (2.1.1)
+    ohai (>= 4.0.0)
+  yum (5.0.0)
+  yum-epel (2.1.1)
+    compat_resource (>= 12.16.3)
+  yum-erlang_solutions (1.0.3)
+    compat_resource (>= 12.16.3)
+    yum-epel (>= 0.0.0)

@@ -1,0 +1,11 @@
+{
+  "apps": [{
+    "name": "api",
+    "script": "./index.js",
+    "cwd": "/home/deploy/app/sanpablo/current/src",
+    "error_file": "/home/deploy/app/sanpablo/shared/logs/app.err.log",
+    "out_file": "/home/deploy/app/sanpablo/shared/logs/app.out.log",
+    "instances"  : 2,
+    "exec_mode"  : "cluster"
+  }]
+}

@@ -1,0 +1,2 @@
+name 'solr'
+description 'solr'

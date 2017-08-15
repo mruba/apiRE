@@ -1,0 +1,8 @@
+dbpath=<%= node.mongodb.config.dbpath %>
+pidfilepath=/var/run/mongodb/mongodb.pid
+logpath=<%= node.mongodb.config.logpath %>
+logappend=true
+
+<% if node.mongodb.config.replSet %>
+replSet = <%= node.mongodb.config.replSet %>
+<% end %>

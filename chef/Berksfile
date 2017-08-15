@@ -1,0 +1,15 @@
+site :opscode
+
+cookbook 'mongodb', github: 'edelight/chef-mongodb'
+cookbook 'sanpablo', path: 'cookbooks/sanpablo'
+cookbook 'rvm', github: 'fnichol/chef-rvm'
+cookbook 'nvm'
+cookbook 'npm'
+cookbook 'sudo'
+cookbook 'jenkins', github: 'opscode-cookbooks/jenkins'
+cookbook 'aws', github: 'opscode-cookbooks/aws'
+cookbook 'haproxy', github: 'hw-cookbooks/haproxy'
+cookbook 'chef-solo-search', github: 'edelight/chef-solo-search'
+cookbook 'rabbitmq', github: 'rabbitmq/chef-cookbook'
+cookbook 'nodejs', github: 'redguide/nodejs'
+cookbook 'pm2', github: 'Mindera/pm2-cookbook'
